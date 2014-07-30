@@ -54,6 +54,7 @@
     <Compile Include="..\..\Documents\Properties\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Page404Extensions.cs" />
     <Compile Include="Page404Middleware.cs" />
     <Compile Include="Page404Options.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
