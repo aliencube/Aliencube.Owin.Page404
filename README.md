@@ -1,6 +1,6 @@
 # Aliencube.Owin.Page404 #
 
-**Aliencube.Owin.Page404** provides an [OWIN](http://owin.org) middleware that handles 404 page in both pre-built and customised.
+**Aliencube.Owin.Page404** provides an [OWIN](http://owin.org) middleware that handles 404 status code by rendering either pre-built page or user-defined page.
 
 
 ## Dependencies ##
