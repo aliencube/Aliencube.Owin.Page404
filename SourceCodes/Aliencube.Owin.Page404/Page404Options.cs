@@ -28,6 +28,14 @@ namespace Aliencube.Owin.Page404
             {
                 throw new ArgumentNullException("sharedOptions");
             }
+
+            this.IsLastMiddleware = true;
         }
+
+        /// <summary>
+        /// Gets or sets the value that specifies whether <c>Page404Middleware</c> sits at the last of the middleware chain or not.
+        /// Default value is <c>True</c>. If <c>Page404Middleware</c> is the only middleware, set this <c>True</c>.
+        /// </summary>
+        public bool IsLastMiddleware { get; set; }
     }
 }

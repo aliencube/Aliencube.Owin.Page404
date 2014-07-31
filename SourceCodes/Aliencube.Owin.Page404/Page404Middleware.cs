@@ -41,15 +41,18 @@ namespace Aliencube.Owin.Page404
         /// <returns></returns>
         public override async Task Invoke(IOwinContext context)
         {
-            var path = context.Request.Uri.AbsolutePath;
+            var path = context.Request.Path;
 
             IEnumerable<IFileInfo> fis;
-            if (this._options.FileSystem.TryGetDirectoryContents(path, out fis))
+            if (this._options.FileSystem.TryGetDirectoryContents(path.Value, out fis))
             {
                 var defaultFileExists = fis.Any(fi => this._options.DefaultFileNames.Contains(fi.Name));
                 if (defaultFileExists)
                 {
-                    await this.Next.Invoke(context);
+                    if (!this._options.IsLastMiddleware)
+                    {
+                        await this.Next.Invoke(context);
+                    }
                 }
                 else
                 {
@@ -59,9 +62,12 @@ namespace Aliencube.Owin.Page404
             else
             {
                 IFileInfo fi;
-                if (this._options.FileSystem.TryGetFileInfo(path, out fi))
+                if (this._options.FileSystem.TryGetFileInfo(path.Value, out fi))
                 {
-                    await this.Next.Invoke(context);
+                    if (!this._options.IsLastMiddleware)
+                    {
+                        await this.Next.Invoke(context);
+                    }
                 }
                 else
                 {

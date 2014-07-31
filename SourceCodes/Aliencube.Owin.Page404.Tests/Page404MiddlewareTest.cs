@@ -3,7 +3,6 @@ using Microsoft.Owin;
 using Microsoft.Owin.FileSystems;
 using Microsoft.Owin.Testing;
 using NUnit.Framework;
-using System.Collections.Generic;
 using System.Net;
 
 namespace Aliencube.Owin.Page404.Tests
@@ -33,15 +32,17 @@ namespace Aliencube.Owin.Page404.Tests
 
         [Test]
         [TestCase("", @"sub", "/textfile.txt", HttpStatusCode.OK)]
-        public void Test(string baseUrl, string baseDir, string requestUrl, HttpStatusCode statusCode)
+        [TestCase("/sub", @".", "sub/textfile.txt", HttpStatusCode.OK)]
+        [TestCase("/sub", @".\sub", "sub/textfile.txt", HttpStatusCode.NotFound)]
+        public async void Test(string baseUrl, string baseDir, string requestUrl, HttpStatusCode statusCode)
         {
             this._server = TestServer.Create(app => app.UsePage404(new Page404Options()
                                                                    {
                                                                        RequestPath = new PathString(baseUrl),
                                                                        FileSystem = new PhysicalFileSystem(baseDir),
-                                                                       DefaultFileNames = new List<string>() { "index.html" },
+                                                                       IsLastMiddleware = true,
                                                                    }));
-            var response = this._server.CreateRequest(requestUrl).GetAsync().Result;
+            var response = await this._server.CreateRequest(requestUrl).GetAsync();
             response.StatusCode.Should().Be(statusCode);
         }
 
