@@ -56,7 +56,8 @@ namespace Aliencube.Owin.Page404
                 }
                 else
                 {
-                    context.Response.StatusCode = 404;
+                    var page404 = new Views.Page404();
+                    page404.Execute(context);
                 }
             }
             else
@@ -71,7 +72,8 @@ namespace Aliencube.Owin.Page404
                 }
                 else
                 {
-                    context.Response.StatusCode = 404;
+                    var page404 = new Views.Page404();
+                    page404.Execute(context);
                 }
             }
         }
