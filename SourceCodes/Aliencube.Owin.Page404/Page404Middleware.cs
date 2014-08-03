@@ -1,4 +1,5 @@
-﻿using Microsoft.Owin;
+﻿using System.IO;
+using Microsoft.Owin;
 using Microsoft.Owin.FileSystems;
 using System;
 using System.Collections.Generic;
@@ -56,8 +57,24 @@ namespace Aliencube.Owin.Page404
                 }
                 else
                 {
-                    var page404 = new Views.Page404();
-                    page404.Execute(context);
+                    if (this._options.UseCustom404Page)
+                    {
+                        IFileInfo fi;
+                        if (this._options.FileSystem.TryGetFileInfo(this._options.Custom404PagePath.Value, out fi))
+                        {
+                            using (var stream = fi.CreateReadStream())
+                            {
+                                context.Response.Body = stream;
+                                context.Response.StatusCode = 404;
+                                context.Response.ContentType = "text/html";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var page404 = new Views.Page404();
+                        page404.Execute(context);
+                    }
                 }
             }
             else
@@ -72,8 +89,23 @@ namespace Aliencube.Owin.Page404
                 }
                 else
                 {
-                    var page404 = new Views.Page404();
-                    page404.Execute(context);
+                    if (this._options.UseCustom404Page)
+                    {
+                        if (this._options.FileSystem.TryGetFileInfo(this._options.Custom404PagePath.Value, out fi))
+                        {
+                            using (var stream = fi.CreateReadStream())
+                            {
+                                context.Response.Body = stream;
+                                context.Response.StatusCode = 404;
+                                context.Response.ContentType = "text/html";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var page404 = new Views.Page404();
+                        page404.Execute(context);
+                    }
                 }
             }
         }

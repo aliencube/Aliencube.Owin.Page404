@@ -1,4 +1,6 @@
-﻿using Microsoft.Owin.StaticFiles;
+﻿using Microsoft.Owin;
+using Microsoft.Owin.FileSystems;
+using Microsoft.Owin.StaticFiles;
 using Microsoft.Owin.StaticFiles.Infrastructure;
 using System;
 
@@ -30,6 +32,7 @@ namespace Aliencube.Owin.Page404
             }
 
             this.IsLastMiddleware = true;
+            this.UseCustom404Page = false;
         }
 
         /// <summary>
@@ -37,5 +40,16 @@ namespace Aliencube.Owin.Page404
         /// Default value is <c>True</c>. If <c>Page404Middleware</c> is the only middleware, set this <c>True</c>.
         /// </summary>
         public bool IsLastMiddleware { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value that specifies whether to use the custom 404 page instead of the built-in page, or not.
+        /// Default value is <c>False</c>.
+        /// </summary>
+        public bool UseCustom404Page { get; set; }
+
+        /// <summary>
+        /// Gets or sets the custom 404 page path.
+        /// </summary>
+        public PathString Custom404PagePath { get; set; }
     }
 }
