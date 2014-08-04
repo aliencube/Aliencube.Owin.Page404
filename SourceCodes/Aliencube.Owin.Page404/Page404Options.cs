@@ -48,8 +48,13 @@ namespace Aliencube.Owin.Page404
         public bool UseCustom404Page { get; set; }
 
         /// <summary>
-        /// Gets or sets the custom 404 page path.
+        /// Gets or sets the custom 404 page path. Unless <c>UseCustom404Page</c> is true, this value will be ignored.
         /// </summary>
         public PathString Custom404PagePath { get; set; }
+
+        /// <summary>
+        /// Gets or sets the custom 404 page directory. Unless <c>UseCustom404Page</c> is true, this value will be ignored.
+        /// </summary>
+        public IFileSystem Custom404PageDir { get; set; }
     }
 }
