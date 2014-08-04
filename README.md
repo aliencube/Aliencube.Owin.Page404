@@ -48,6 +48,9 @@ public class Startup
 * `FileSystem`: The file system used to locate resources.
 * `DefaultFileNames`: An ordered list of file names to select by default. List length and ordering may affect performance. List of default pages in order are `default.htm`, `default.html`, `index.htm` and `index.html`.
 * `IsLastMiddleware`: Gets or sets the value that specifies whether `Page404Middleware` sits at the last of the middleware chain or not. Default value is `true`. If `Page404Middleware` is the only middleware, set this `true`.
+* `UseCustom404Page`: Gets or sets the value that specifies whether to use the custom 404 page instead of the built-in page, or not. Default value is `false`.
+* `Custom404PagePath`: Gets or sets the custom 404 page path. Unless `UseCustom404Page` is `true`, this value will be ignored.
+* `Custom404PageDir`: Gets or sets the custom 404 page directory. Unless `UseCustom404Page` is `true`, this value will be ignored.
 
 
 ## Contribution ##
