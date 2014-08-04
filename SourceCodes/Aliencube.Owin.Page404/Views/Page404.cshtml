@@ -1,0 +1,23 @@
+﻿@using System.Globalization
+@using Aliencube.Owin.Page404
+
+@{
+    Response.StatusCode = 404;
+    Response.ReasonPhrase = Resources.Page404Html_Title;
+    Response.ContentType = "text/html";
+    Response.ContentLength = null; // Clear any prior Content-Length
+}
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>@Resources.Page404Html_Title</title>
+    <style>
+        @(@"[[Page404.css]]") 
+    </style>
+</head>
+<body>
+    <h1>@Resources.Page404Html_Title</h1>
+    <h2>@Resources.Page404Html_PageNotFound</h2>
+</body>
+</html>

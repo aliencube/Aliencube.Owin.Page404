@@ -42,6 +42,14 @@ public class Startup
 ```
 
 
+### `Page404Options` ###
+
+* `RequestPath`: The relative request path that maps to static resources. **NOT USED**
+* `FileSystem`: The file system used to locate resources.
+* `DefaultFileNames`: An ordered list of file names to select by default. List length and ordering may affect performance. List of default pages in order are `default.htm`, `default.html`, `index.htm` and `index.html`.
+* `IsLastMiddleware`: Gets or sets the value that specifies whether `Page404Middleware` sits at the last of the middleware chain or not. Default value is `true`. If `Page404Middleware` is the only middleware, set this `true`.
+
+
 ## Contribution ##
 
 Your contribution is always welcome! All your work should be done in the`dev` branch. Once you finish your work, please send us a pull request on `dev` for review. Make sure that all your changes **MUST** be covered with test codes; otherwise yours won't get accepted.

@@ -1,4 +1,5 @@
-﻿using Microsoft.Owin;
+﻿using System.IO;
+using Microsoft.Owin;
 using Microsoft.Owin.FileSystems;
 using System;
 using System.Collections.Generic;
@@ -41,38 +42,98 @@ namespace Aliencube.Owin.Page404
         /// <returns></returns>
         public override async Task Invoke(IOwinContext context)
         {
-            var path = context.Request.Path;
-
-            IEnumerable<IFileInfo> fis;
-            if (this._options.FileSystem.TryGetDirectoryContents(path.Value, out fis))
+            if (context == null)
             {
-                var defaultFileExists = fis.Any(fi => this._options.DefaultFileNames.Contains(fi.Name));
-                if (defaultFileExists)
+                throw new ArgumentNullException("context");
+            }
+
+            if (this.IsValidRequestPath(context))
+            {
+                if (!this._options.IsLastMiddleware)
                 {
-                    if (!this._options.IsLastMiddleware)
-                    {
-                        await this.Next.Invoke(context);
-                    }
-                }
-                else
-                {
-                    context.Response.StatusCode = 404;
+                    await this.Next.Invoke(context);
                 }
             }
             else
             {
-                IFileInfo fi;
-                if (this._options.FileSystem.TryGetFileInfo(path.Value, out fi))
-                {
-                    if (!this._options.IsLastMiddleware)
-                    {
-                        await this.Next.Invoke(context);
-                    }
-                }
-                else
-                {
-                    context.Response.StatusCode = 404;
-                }
+                this.LoadPage404(context);
+            }
+        }
+
+        /// <summary>
+        /// Checks whether the request path is valid or not.
+        /// </summary>
+        /// <param name="context">OWIN context instance.</param>
+        /// <returns>Returns <c>True</c>, if the request path is valid; otherwise returns <c>False</c>.</returns>
+        private bool IsValidRequestPath(IOwinContext context)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
+
+            var path = context.Request.Path;
+            return this.IsValidRequestDirectory(path) || this.IsValidRequestFile(path);
+        }
+
+        /// <summary>
+        /// Checks whether the request path is a valid directory with default file names or not.
+        /// </summary>
+        /// <param name="requestPath">Request path.</param>
+        /// <returns>Returns <c>True</c>, if the request path is a valid directory with default file names; otherwise returns <c>False</c>.</returns>
+        private bool IsValidRequestDirectory(PathString requestPath)
+        {
+            IEnumerable<IFileInfo> fis;
+            var validDirectory = this._options.FileSystem.TryGetDirectoryContents(requestPath.Value, out fis);
+            var validDefaultFile = fis != null && fis.Any(fi => this._options.DefaultFileNames.Contains(fi.Name));
+            return validDirectory && validDefaultFile;
+        }
+
+        /// <summary>
+        /// Checks whether the request path is a valid file or not.
+        /// </summary>
+        /// <param name="requestPath">Request path.</param>
+        /// <returns>Returns <c>True</c>, if the request path is a valid file; otherwise returns <c>False</c>.</returns>
+        private bool IsValidRequestFile(PathString requestPath)
+        {
+            IFileInfo fi;
+            var validFile = this._options.FileSystem.TryGetFileInfo(requestPath.Value, out fi);
+            return validFile;
+        }
+
+        /// <summary>
+        /// Loads the 404 page.
+        /// </summary>
+        /// <param name="context">OWIN context instance.</param>
+        private void LoadPage404(IOwinContext context)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
+
+            if (!this._options.UseCustom404Page)
+            {
+                var page404 = new Views.Page404();
+                page404.Execute(context);
+
+                return;
+            }
+
+            context.Response.StatusCode = 404;
+            context.Response.ReasonPhrase = Resources.Page404Html_Title;
+
+            IFileInfo fi;
+            if (!this._options.Custom404PageDir.TryGetFileInfo(this._options.Custom404PagePath.Value, out fi))
+            {
+                return;
+            }
+
+            using (var reader = new StreamReader(fi.CreateReadStream()))
+            using (var writer = new StreamWriter(context.Response.Body))
+            {
+                writer.WriteAsync(reader.ReadToEndAsync().Result);
+                context.Response.ContentType = "text/html";
             }
         }
     }

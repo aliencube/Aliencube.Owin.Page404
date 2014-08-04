@@ -1,0 +1,59 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Web.Razor" #>
+<#@ import namespace="Microsoft.CSharp" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Globalization" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Web.Razor" #>
+<#@ import namespace="System.Web.Razor.Text" #>
+<#@ output extension=".cs" #>
+<#
+    var host = new RazorEngineHost(new CSharpRazorCodeLanguage())
+               {
+                   DefaultBaseClass = "Aliencube.Owin.Page404.Views.BaseView"
+               };
+    var engine = new RazorTemplateEngine(host);
+    var path = Host.ResolvePath("Page404.cshtml");
+    var source = String.Empty;
+    using (var reader = new StreamReader(path))
+    {
+        var code = engine.GenerateCode(reader, "Page404", "Aliencube.Owin.Page404.Views", @"Page404.cshtml");
+        using (var provider = new CSharpCodeProvider())
+        using (var writer = new StringWriter())
+        {
+            provider.GenerateCodeFromCompileUnit(code.GeneratedCode, writer, null);
+            source = writer.ToString();
+
+            var startIndex = 0;
+            while (startIndex < source.Length)
+            {
+                var startMatch = @"Write(@""[[";
+                var startCode = @"WriteLiteral(@""";
+                var endMatch = @"]]"");";
+                var endCode = @""");";
+
+                startIndex = source.IndexOf(startMatch, startIndex, StringComparison.Ordinal);
+                if (startIndex == -1)
+                {
+                    break;
+                }
+
+                var endIndex = source.IndexOf(endMatch, startIndex, StringComparison.Ordinal);
+                if (endIndex == -1)
+                {
+                    break;
+                }
+
+                var fileName = source.Substring(startIndex + startMatch.Length, endIndex - (startIndex + startMatch.Length));
+                var replacement = File.ReadAllText(Host.ResolvePath(fileName)).Replace("\"", "\"\"");
+
+                source = source.Substring(0, startIndex) + startCode + replacement + endCode + source.Substring(endIndex + endMatch.Length);
+                startIndex = startIndex + startCode.Length + replacement.Length + endCode.Length;
+            }
+        }
+    }
+#>
+<#=source#>
